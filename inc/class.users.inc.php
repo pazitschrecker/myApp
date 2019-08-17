@@ -10,6 +10,39 @@
   */
   
   class ColoredListsUsers {
+   
+   private function sendVerificationEmail($email, $ver) {
+       $e = sha1($email); // For verification purposes
+       $to = trim($email);
+    
+       $subject = "[Colored Lists] Please Verify Your Account";
+       
+       $headers = <<<MESSAGE
+   From: Colored Lists <donotreply@coloredlists.com>
+   Content-Type: text/plain;
+   MESSAGE;
+       $msg = <<<EMAIL
+   You have a new account at Colored Lists!
+   
+   To get started, please activate your account and choose a password by following the link below.
+   
+   Your Username: $email
+ 
+Activate your account: http://coloredlists.com/accountverify.php?v=$ver&e=$e
+ 
+If you have any questions, please contact help@coloredlists.com.
+ 
+--
+Thanks!
+ 
+Chris and Jason
+www.ColoredLists.com
+EMAIL;
+ 
+        return mail($to, $subject, $msg, $headers);
+    }
+}
+     
     /**
     * The database object
     *
