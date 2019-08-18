@@ -137,9 +137,9 @@ $('#add-new').submit(function(){
 
     if(newListItemText.length > 0) {
         $.ajax({
-
-                // DEVELOPER, save new list item!
-
+          type:  "POST",
+          url: "db-interaction/lists.php",
+          data: "action=add&list=" forList    "&text="    URLtext   "&pos="   newListItemRel,
             success: function(theResponse){
               $("#list").append("<li color='1' class='colorBlue' rel='"+newListItemRel+"' id='" + theResponse + "'><span id=""+theResponse+"listitem" title='Click to edit...'>" + newListItemText + "</span><div class='draggertab tab'></div><div class='colortab tab'></div><div class='deletetab tab'></div><div class='donetab tab'></div></li>");
               bindAllTabs("#list li[rel='"+newListItemRel+"'] span");
