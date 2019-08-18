@@ -11,6 +11,35 @@
   
   class ColoredListsUsers {
    
+   /**
+    * Resets a user's status to unverified and sends them an email
+    * 
+    * @return mixed TRUE on success and a message on failure
+    */
+   
+   public function resetPassword() {
+       $sql = "UPDATE users 
+               SET verified=0
+               WHERE Username=:user
+               LIMIT 1";
+       try {
+           $stmt = $this->_db->prepare($sql);
+           $stmt->bindParam(":user", $_POST['username'], PDO::PARAM_STR);
+           $stmt->execute();
+           $stmt->closeCursor();
+       }
+       catch (PDOException $e) {
+           return $e->getMessage();
+       }
+    
+       // SEnd the reset email
+       if(!$this->sendResetEmail($_POST['username'], $v)) {
+           return "Sending the email failed!";
+       }
+       return TRUE;
+   }
+  }
+   
    public function deleteAccount() {
        if(isset($_SESSION['LoggedIn']) && $_SESSION['LoggedIn]==1) {
            // Delete list items
