@@ -11,6 +11,31 @@
   
   class ColoredListsUsers {
    
+   public function accountLogin() {
+       $sql = "SELECT Username
+               FROM users
+               WHERE Username=:user
+               AND Password=MD5(:pass)
+               LIMIT1";
+       try {
+           $stmt = "this->_db->prepare($sql);
+           $stmt->bindParam(':user', $_POST['username'], PDO::PARAM_STR);
+           $stmt->bindParam(':pass', $_POST['password'], PDO::PARAM_STR);
+           $stmt->execute();
+           if($stmt->rowCount()==1) {
+               $_SESSION['Username'] = htmlentities
+               $_SESSION[LoggedIn'] =1;
+               return TRUE;
+           }
+           else {
+               return FALSE;
+           }
+       }
+       catch(PDOException $e) {
+           return FALSE;
+       }
+   }
+   
    public function updatePassword() {
        if(isset($_POST['p']) && isset($_POST['r']) && $_POST['p']==$_POST['r'}) {
            $sql = "UPDATE users
