@@ -11,6 +11,65 @@
   
   class ColoredListsUsers {
    
+   public function updatePassword() {
+       if(isset($_POST['p']) && isset($_POST['r']) && $_POST['p']==$_POST['r'}) {
+           $sql = "UPDATE users
+                   SET Password=MD5(:pass), verified=1
+                   WHERE ver_code=:ver
+                   LIMIT1";
+        try {
+            $stmt = $this->_db->prepare($sql);
+                $stmt->bindParam(":pass", $_POST['p'], PDO::PARAM_STR);
+                $stmt->bindParam(":ver", $_POST['v'], PDO::PARAM_STR);
+                $stmt->execute();
+                $stmt->closeCursor();
+ 
+                return TRUE;
+            }
+            catch(PDOException $e)
+            {
+                return FALSE;
+            }
+        }
+                                                                     
+        else {
+            return FALSE;
+        }
+      }
+   
+   public function verifyAccount() {
+       $sql = "SELECT Username
+               FROM users
+               WHERE ver_code=:ver
+               AND SHA1(Username)=:user
+               AND verified=0";
+       if($stmt = $this->_db->prepare($sql)) {
+           $stmt->bindParam(':ver', $_GET['v'], PDO::PARAM_STR);
+           $stmt->bindParam(':user', $_GET['e'], PDO::PARAM_STR);
+           $stmt->execute();
+           $row = $stmt->fetch();
+           if(isset($row['Username])) {
+               // Logs the user in if verification is successful
+               $_SESSION['Username'] = $row['Username];
+               $_SESSION['LoggedIn'] = 1;
+           }
+           else {
+               return array(4, "<h2>Verification Error</h2>n"
+                    . "<p>This account has already been verified. "
+                    . "Did you <a href="/password.php">forget "
+                    . "your password?</a>");
+            }
+            $stmt->closeCursor();
+            
+            // No error message is required if verification is successful
+            return array(0, NULL);
+        }
+        else
+        {
+            return array(2, "<h2>Error</h2>n<p>Database error.</p>");
+        }
+                  
+   
    private function sendVerificationEmail($email, $ver) {
        $e = sha1($email); // For verification purposes
        $to = trim($email);
