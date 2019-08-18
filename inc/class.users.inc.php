@@ -12,6 +12,45 @@
   class ColoredListsUsers {
    
    /**
+    * Sends a link to a user that lets them reset their password
+    * 
+    * @param string $email  the user's emaol address
+    * @param string $ver    the user's verification code
+    * @return boolean       TRUE on success and FALSE on failure
+    */
+   
+   private function sendResetEmail($email, $ver) {
+       $e = sha1($email); // For verification purposes
+       $to = trim($email);
+       
+       $subject = "[Colored Lists] Request to Reset Your Password";
+    
+       $headers = <<<MESSAGE
+   From: Colored Lists <donotreply@coloredlists.com>
+Content-Type: text/plain;
+MESSAGE;
+ 
+        $msg = <<<EMAIL
+We just heard you forgot your password! Bummer! To get going again,
+head over to the link below and choose a new password.
+ 
+Follow this link to reset your password:
+http://coloredlists.com/resetpassword.php?v=$ver&e=$e
+ 
+If you have any questions, please contact help@coloredlists.com.
+ 
+--
+Thanks!
+ 
+Chris and Jason
+www.ColoredLists.com
+EMAIL;
+ 
+        return mail($to, $subject, $msg, $headers);
+    }
+}
+   
+   /**
     * Resets a user's status to unverified and sends them an email
     * 
     * @return mixed TRUE on success and a message on failure
