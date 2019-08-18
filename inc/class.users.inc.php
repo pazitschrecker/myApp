@@ -11,6 +11,25 @@
   
   class ColoredListsUsers {
    
+   public function retrieveAcccountInfo() {
+       $sql = "SELECT UserID, ver_code
+               FROM users
+               WHERE Username=:user";
+       try {
+           $stmt = $this->_db->prepare($sql);
+            $stmt->bindParam(':user', $_SESSION['Username'], PDO::PARAM_STR);
+            $stmt->execute();
+            $row = $stmt->fetch();
+            $stmt->closeCursor();
+            return array($row['UserID'], $row['ver_code']);
+        }
+        catch(PDOException $e)
+        {
+            return FALSE;
+        }
+    }
+}
+   
    public function accountLogin() {
        $sql = "SELECT Username
                FROM users
