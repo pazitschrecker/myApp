@@ -11,6 +11,97 @@
   
   class ColoredListsUsers {
    
+   public function deleteAccount() {
+       if(isset($_SESSION['LoggedIn']) && $_SESSION['LoggedIn]==1) {
+           // Delete list items
+           $sql = "DELETE FROM list_items
+                   WHERE ListID=(
+                       SELECT ListID
+                       FROM lists
+                       WHERE UserID=:user
+                       LIMIT 1
+                   )";
+           try {
+                $stmt = $this->_db->prepare($sql);
+                $stmt->bindParam(":user", $_POST['user-id'], PDO::PARAM_INT);
+                $stmt->execute();
+                $stmt->closeCursor();
+            }
+            catch(PDOException $e)
+            {
+                die($e->getMessage());
+            }
+            
+            // Delete the users lists(s)
+            $sql = "DELETE FROM lists
+                    WHERE UserID=:user";
+            try {
+                $stmt = $this->_db->prepare($sql);
+                $stmt->bindParam(":user", $_POST['user-id'], PDO::PARAM_INT);
+                $stmt->execute();
+                $stmt->closeCursor();
+            }
+            catch(PDOException $e)
+            {
+                die($e->getMessage());
+            }
+            
+            // Delete the user
+            $sql = "DELETE FROM users
+                    WHERE UserID=:user
+                    AND Username=:email";
+            try
+            {
+                $stmt = $this->_db->prepare($sql);
+                $stmt->bindParam(":user", $_POST['user-id'], PDO::PARAM_INT);
+                $stmt->bindParam(":email", $_SESSION['Username'], PDO::PARAM_STR);
+                $stmt->execute();
+                $stmt->closeCursor();
+            }
+            catch(PDOException $e)
+            {
+                die($e->getMessage());
+            }
+            
+            // Destroy the user's session and send to a confirmation page
+            unset($_SESSION['LoggedIn'], $_SESSION['Username']);
+            header("Location: /gone.php");
+            exit;
+        }
+        else
+        {
+            header("Location: /account.php?delete=failed");
+            exit;
+        }
+    }
+}
+   
+   public function updatePassword() {
+       if(isset($_POST['p']) && isset($_POST['r']) {
+           $sql = "UPDATE users
+                   SET Password=MD5(:pass), verified=1
+                   WHERE ver_code=:ver
+                   LIMIT 1";
+           try {
+                $stmt = $this->_db->prepare($sql);
+                $stmt->bindParam(":pass", $_POST['p'], PDO::PARAM_STR);
+                $stmt->bindParam(":ver", $_POST['v'], PDO::PARAM_STR);
+                $stmt->execute();
+                $stmt->closeCursor();
+ 
+                return TRUE;
+            }
+            catch(PDOException $e)
+            {
+                return FALSE;
+            }
+        }
+        else {
+            return FALSE;
+        }
+    }
+}
+   
    public function retrieveAcccountInfo() {
        $sql = "SELECT UserID, ver_code
                FROM users
